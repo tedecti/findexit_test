@@ -1,12 +1,18 @@
 using System.Text;
 using findexit_test.Data;
+using findexit_test.Middlewares;
+using findexit_test.Repositories;
+using findexit_test.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
-var app = builder.Build(); 
+
+//scopes
+builder.Services.AddScoped<IAuthorizationRepository, AuthorizationRepository>();
+
 //controllers
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -79,6 +85,7 @@ builder.Services.AddSwaggerGen(setup =>
     });
 });
 
+var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
@@ -86,4 +93,7 @@ app.MapControllers();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<ErrorHandlingMiddleware>();
+
 app.Run();

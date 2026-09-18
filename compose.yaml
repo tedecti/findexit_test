@@ -1,7 +1,32 @@
-﻿services:
-  findexit_test:
-    image: findexit_test
+services:
+  api:
     build:
       context: .
       dockerfile: findexit_test/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__Npgsql: Host=postgres;Port=5432;Database=findexit;Username=postgres;Password=postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
 
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: findexit
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d findexit"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres_data:

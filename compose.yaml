@@ -1,0 +1,7 @@
+﻿services:
+  findexit_test:
+    image: findexit_test
+    build:
+      context: .
+      dockerfile: findexit_test/Dockerfile
+

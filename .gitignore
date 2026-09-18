@@ -1,0 +1,38 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio / Rider user-specific files
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.rsuser
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+
+# Test and coverage results
+[Tt]est[Rr]esult*/
+*.trx
+coverage*/
+*.coverage
+*.coveragexml
+
+# Local secrets and environment overrides
+secrets.json
+appsettings.Local.json
+appsettings.*.local.json
+.env
+.env.*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db

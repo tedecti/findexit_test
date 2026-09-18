@@ -3,6 +3,8 @@ using findexit_test.Data;
 using findexit_test.Middlewares;
 using findexit_test.Repositories;
 using findexit_test.Repositories.Interfaces;
+using findexit_test.Services;
+using findexit_test.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -12,6 +14,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 //scopes
 builder.Services.AddScoped<IAuthorizationRepository, AuthorizationRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICacheService, CacheService>();
+
+//automapper
+builder.Services.AddAutoMapper(cfg => { }, typeof(findexit_test.Data.AutoMapper));
 
 //controllers
 builder.Services.AddControllers();
@@ -20,13 +28,10 @@ builder.Services.AddEndpointsApiExplorer();
 //dbcontext
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Npgsql")));
-
-
 builder.Services.AddMemoryCache();
 
 //jwt auth
 var key = builder.Configuration.GetValue<string>("ApiSettings:Secret");
-
 builder.Services.AddAuthentication(x =>
 {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -44,13 +49,15 @@ builder.Services.AddAuthentication(x =>
     };
     x.Events = new JwtBearerEvents
     {
-        OnMessageReceived = context => {
+        OnMessageReceived = context =>
+        {
             var accessToken = context.Request.Query["access_token"];
             var path = context.HttpContext.Request.Path;
             if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/chatHub"))
             {
                 context.Token = accessToken;
             }
+
             return Task.CompletedTask;
         }
     };
